@@ -6,29 +6,9 @@ from flask import Flask, request, make_response
 
 app = Flask(__name__)
 
-# Dead Code 1: Unreachable code
-def dead_code_unreachable():
-    return
-    print("This code is never executed")
-
-# Dead Code 2: Unused function
-def dead_code_unused():
-    a = 10
-    b = 20
-    return a + b
-
-# Dead Code 3: Unused variable
-unused_variable = "I am not used anywhere"
-
-# Dead Code 4: Conditional block that never runs
-if False:
-    print("This will never run")
-
-# Dead Code 5: Deprecated or insecure usage
-def dead_code_pickle_example():
-    pickled_data = pickle.dumps({"a": 1})
-    # Function never called
-    return pickle.loads(pickled_data)
+# --------------------
+# Real Endpoints with Vulnerabilities
+# --------------------
 
 def sql_injection(user_input):
     conn = sqlite3.connect("test.db")
@@ -71,11 +51,58 @@ def xss_vulnerability():
 def insecure_deserialization(serialized_data):
     return pickle.loads(serialized_data)
 
-# Dead Code 6: Dead import
-import math  # not used
+# --------------------
+# DEAD CODES WITH VULNERABILITIES
+# --------------------
 
-# Dead Code 7: Unused constant
-UNUSED_CONSTANT = 42
+# Dead Vulnerability 1: SQL Injection (never used)
+def dead_sql_injection():
+    user_input = "' OR '1'='1"
+    conn = sqlite3.connect("test.db")
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM users WHERE username = '{user_input}'")  # vulnerable
+    data = cursor.fetchall()
+    conn.close()
+    return data
+
+# Dead Vulnerability 2: Hardcoded Credentials
+def dead_hardcoded_credentials():
+    username = "admin"
+    password = "SuperSecret123!"  # hardcoded password
+    if username == "admin" and password == "SuperSecret123!":
+        return True
+    return False
+
+# Dead Vulnerability 3: Insecure Deserialization
+def dead_insecure_deserialization():
+    malicious_data = b"cos\nsystem\n(S'echo vulnerable'\ntR."
+    return pickle.loads(malicious_data)  # never called but vulnerable
+
+# Dead Vulnerability 4: Path Traversal
+def dead_path_traversal():
+    user_file = "../../etc/passwd"
+    with open(user_file, "r") as f:
+        return f.read()
+
+# Dead Vulnerability 5: XXE via XML parsing
+def dead_xxe():
+    xml_data = """<?xml version="1.0"?>
+    <!DOCTYPE foo [ <!ELEMENT foo ANY >
+    <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>
+    <foo>&xxe;</foo>"""
+    ET.fromstring(xml_data)
+
+# Dead Vulnerability 6: Command Injection
+def dead_command_injection():
+    user_input = "test; rm -rf /"
+    os.system("echo " + user_input)  # vulnerable to injection
+
+# --------------------
+# Unused Constants / Dummy Declarations
+# --------------------
+
+UNUSED_SECRET = "shhh_this_is_a_secret_key_123456"
+UNUSED_API_KEY = "AIzaSyD-DeadCode-APIKEY-HERE"
 
 if __name__ == "__main__":
     app.run(debug=True)
